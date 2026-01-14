@@ -1,0 +1,20 @@
+services:
+  waf:
+    build: .
+    container_name: waf
+    ports:
+      - "8080:8080"
+    entrypoint: ["nginx", "-g", "daemon off;"]
+    volumes:
+      # 【追加】メイン設定ファイルを差し替え
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      # プロキシ設定
+      - ./nginx-proxy.conf:/etc/nginx/conf.d/default.conf:ro
+      # WAFルール
+      - ./main.conf:/etc/modsecurity.d/main.conf:ro
+    depends_on:
+      - app
+
+  app:
+    image: bkimminich/juice-shop
+    container_name: app
